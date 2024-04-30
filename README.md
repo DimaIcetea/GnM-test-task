@@ -12,7 +12,7 @@ This is a simple automation script for LinkedIn written in C# using Selenium Web
 
 1. Clone the repository:
 
-git clone https://github.com/yourusername/linkedin-automation.git
+git clone https://github.com/DimaIcetea/GnM-test-task
 
 2. Navigate to the project directory:
 
