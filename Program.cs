@@ -12,12 +12,24 @@ namespace LinkedInAutomation
     {
         static void Main(string[] args)
         {
+            if (!IsFirstRun())
+            {
+                Console.WriteLine("Программа уже была запущена. Продолжение выполнения...");
+            }
+            else
+            {
+                Console.WriteLine("Программа запущена впервые. Enter для продолжения");
+                Console.ReadLine();
+                CreateFirstRunFile();
+            }
+
             Credentials credentials = LoadCredentials("credentials.json");
 
             string driverPath = @"C:\Program Files\Google\Chrome\Application\chromedriver.exe";
 
             var options = new ChromeOptions();
             options.AddArgument("--disable-notifications");
+            
             using (var driver = new ChromeDriver(driverPath, options))
             {
                 driver.Navigate().GoToUrl("https://www.linkedin.com/login");
@@ -31,7 +43,7 @@ namespace LinkedInAutomation
 
                 string profileName = profileInfoElement.Text.Trim();
 
-                Console.WriteLine($"Ім`я профілю: {profileName}");
+                Console.WriteLine($"Имя профиля:: {profileName}");
 
                 IWebElement profileLink = null;
                 try
@@ -40,7 +52,7 @@ namespace LinkedInAutomation
                 }
                 catch (NoSuchElementException)
                 {
-                    Console.WriteLine("Error: Profile link element not found.");
+                    Console.WriteLine("Error: Профиль не найден");
                     return;
                 }
 
@@ -57,7 +69,7 @@ namespace LinkedInAutomation
                 {
                     client.DownloadFile(new Uri(backgroundImageUrl), savePath);
                 }
-                Console.WriteLine("Фон профіля загружено");
+                Console.WriteLine("Фон профиля скачан");
 
                 IWebElement profileImageElement = driver.FindElement(By.CssSelector("img.profile-photo-edit__preview"));
                 string profileImageUrl = profileImageElement.GetAttribute("src");
@@ -66,7 +78,7 @@ namespace LinkedInAutomation
                 {
                     client.DownloadFile(new Uri(profileImageUrl), savePath);
                 }
-                Console.WriteLine("Аватарка профілю загружена");
+                Console.WriteLine("Аватарка профиля скачана");
             }
         }
         static Credentials LoadCredentials(string filePath)
@@ -74,10 +86,18 @@ namespace LinkedInAutomation
             string json = File.ReadAllText(filePath);
             return JsonConvert.DeserializeObject<Credentials>(json);
         }
+        static bool IsFirstRun()
+        {
+            return !File.Exists("firstrun.txt");
+        }
+        static void CreateFirstRunFile()
+        {
+            File.Create("firstrun.txt").Close();
+        }
+
+
     }
-
-
-}
+    }
 public class Credentials
 {
     public string Username { get; set; }
